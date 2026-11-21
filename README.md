@@ -61,14 +61,14 @@ Everything is bundled: the Windows PHP runtime (official pmmp build), PocketMine
 3. Pick your language, select the server version you want in the panel, press **Start**, and share your address (see the network tools in the Tools tab).
 4. Friends join from the same network with `your-ip:19132`; use the Public-IP / UPnP tool to go online.
 
-> Data (servers, worlds, plugins, settings) lives in `%APPDATA%\PMPanel` - same layout as the Android app's private storage. Diagnostics go to `%APPDATA%\PMPanel\logs\app-crash.log`.
+> Data (servers, worlds, plugins, settings) lives in `%APPDATA%\PMPanel` - same layout as the Android app's private storage. Diagnostics go to `%APPDATA%\PMPanel\server\logs\app-crash.log`.
 
 ## 🩺 Troubleshooting
 
 | Problem | What to do |
 | --- | --- |
-| Window opens white / empty | Fixed automatically since 2.8.1: the app detects a failed render and relaunches itself in software-rendering mode, and falls back to a backup copy of the UI if the local server is blocked. If you still see it, just restart the app once. |
-| App does not open at all | Check `%APPDATA%\PMPanel\logs\app-crash.log`, then delete `%LOCALAPPDATA%\PMPanel\app` (extracted UI cache) and start again. |
+| Window opens white / empty | Fixed since **2.8.2**: the boot shim now launches the UI correctly on the desktop engine, the layout falls back gracefully where the engine lacks `env()` support, and storage is guarded so a locked WebView data folder can no longer break startup. If the UI ever fails to boot, the app now shows a readable error card instead of an empty window. Older 2.8.1 builds are affected - please update. |
+| App does not open at all | Check `%APPDATA%\PMPanel\server\logs\app-crash.log`, then delete `%LOCALAPPDATA%\PMPanel\app` (extracted UI cache) and start again. |
 | Antivirus complains about `pmbot.exe` / `php.exe` | They are the bundled fake-player engine and the official pmmp PHP runtime - whitelist the `%APPDATA%\PMPanel\bin` folder. |
 | Port 19132 already in use | The panel detects the conflict and moves the server to a free port automatically; check the console note. |
 | Friends cannot connect | Start the connectivity self-test (Tools tab), forward UDP `19132` on your router or use the built-in UPnP tool, and make sure Windows Firewall allows `php.exe`. |
