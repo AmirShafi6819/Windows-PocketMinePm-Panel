@@ -24,7 +24,7 @@
   <a href="#-screenshots">📸 Screenshots</a> &nbsp;·&nbsp;
   <a href="#-releases--start-here">📥 Download</a> &nbsp;·&nbsp;
   <a href="#-features-identical-to-the-android-app">🚀 Features</a> &nbsp;·&nbsp;
-  <a href="#-fork-attribution--منشأ-فورک">🔱 Fork</a> &nbsp;·&nbsp;
+  <a href="#-fork-attribution">🔱 Fork</a> &nbsp;·&nbsp;
   <a href="#-troubleshooting">🩺 Troubleshooting</a> &nbsp;·&nbsp;
   <a href="#-license">📄 License</a>
 </p>
@@ -37,7 +37,7 @@
 
 The whole panel UI, every feature and every tool of the Android app is preserved - only the Android plumbing (WebView client, SAF file pickers, foreground service, battery optimizations) was replaced with native Windows equivalents.
 
-## 📸 Screenshots · اسکرین‌شات‌ها
+## 📸 Screenshots
 
 <table>
   <tr>
@@ -64,11 +64,9 @@ The whole panel UI, every feature and every tool of the Android app is preserved
 
 <p align="center"><sub><i>Dark theme, full RTL Persian UI — exactly as it looks on Windows 10/11.</i></sub></p>
 
-## 🔱 Fork Attribution · منشأ فورک
+## 🔱 Fork Attribution
 
 **EN:** This project is **forked from [EXBYPIXEL/Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel)** — the original Android panel for running PacketMine (PocketMine-MP) on phones. That project is the source of the panel UI, its features and its design; this repository carries that work over to **Windows** as a native desktop app (JavaFX shell + desktop bridge) and continues its development. All credit for the original panel goes to **EXBYPIXEL**.
-
-**FA (فارسی):** این پروژه **فورک‌شده از [EXBYPIXEL/Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel)** است — پنل اصلی اندروید برای اجرای PacketMine (PocketMine-MP) روی موبایل. رابط کاربری، قابلیت‌ها و طراحی پنل از آن پروژه می‌آید؛ این ریپو همان کار را به **ویندوز** آورده (پوسته دسکتاپ JavaFX + پل ارتباطی دسکتاپ) و توسعه آن را ادامه می‌دهد. تمام اعتبار پنل اصلی متعلق به **EXBYPIXEL** است.
 
 | | Upstream (Android) | This repo (Windows) |
 | --- | --- | --- |
