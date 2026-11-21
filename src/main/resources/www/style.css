@@ -1323,3 +1323,28 @@ a { color: var(--primary-hi); text-decoration: none; }
 @media (min-width: 480px) {
   .mk-stats { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ================= v2.8.1 desktop (Windows port) =================
+   The layout below 980px stays the phone layout, byte-for-byte identical
+   to the Android app. From desktop window widths on, every view becomes
+   a centered reading column and the dock turns into a centered floating
+   bar. Nothing is removed: all views, dialogs, dock tabs and console
+   behaviour are unchanged. */
+@media (min-width: 980px) {
+  #topbar { padding-inline: 24px; }
+  #view { padding-inline: 28px; }
+  #view > * { width: 100%; max-width: 900px; margin-inline: auto; }
+  /* the console keeps its full-viewport Termux-style screen */
+  #view.fill { padding-inline: 0; }
+  #view.fill > * { max-width: none; }
+  #bottomnav {
+    left: 50%; right: auto;
+    transform: translateX(-50%);
+    width: min(560px, 64vw);
+  }
+  .hero .h-stats { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 1280px) {
+  #view { padding-inline: 34px; }
+  #view > * { max-width: 1020px; }
+}

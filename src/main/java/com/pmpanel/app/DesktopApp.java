@@ -190,8 +190,11 @@ public class DesktopApp extends Application {
         }
         stage.setMinWidth(480);
         stage.setMinHeight(600);
+        applySavedWindowGeometry(stage);
+        installWindowKeys(stage, scene);
         stage.setScene(scene);
         stage.setOnCloseRequest(e -> {
+            saveWindowGeometry(stage);
             if (ServerManager.anyRunning()) {
                 // servers keep running in the background (same contract as the
                 // Android foreground service); the tray icon provides control.
@@ -213,6 +216,91 @@ public class DesktopApp extends Application {
     @Override
     public void stop() {
         if (uiServer != null) uiServer.stop();
+    }
+
+    /* ================= desktop window behaviour ================= */
+
+    /*
+     * The Android app was a phone screen; the desktop window is a real
+     * Windows window: first launch opens MAXIMIZED (fullscreen-like work
+     * area), the chosen size/position is remembered across launches, and
+     * F11 toggles true Windows fullscreen (ESC leaves it again).
+     */
+
+    /** Restore the remembered geometry, or open maximized on first launch. */
+    private static void applySavedWindowGeometry(Stage stage) {
+        Prefs p = Prefs.get();
+        if (p.getBoolean("win.full", false)) {
+            Platform.runLater(() -> stage.setFullScreen(true));
+            return;
+        }
+        if (p.contains("win.w") && p.contains("win.h")) {
+            int w = p.getInt("win.w", 0), h = p.getInt("win.h", 0);
+            if (w >= (int) stage.getMinWidth() && h >= (int) stage.getMinHeight()) {
+                stage.setWidth(w);
+                stage.setHeight(h);
+                int x = p.getInt("win.x", Integer.MIN_VALUE);
+                int y = p.getInt("win.y", Integer.MIN_VALUE);
+                if (fitsOnScreen(x, y, w, h)) {
+                    stage.setX(x);
+                    stage.setY(y);
+                }
+                if (p.getBoolean("win.max", false)) {
+                    Platform.runLater(() -> stage.setMaximized(true));
+                }
+                return;
+            }
+        }
+        // first launch (or unusable geometry): fill the Windows work area
+        Platform.runLater(() -> stage.setMaximized(true));
+    }
+
+    /** Keep maximized/fullscreen flags current while the window is used. */
+    private static void installWindowKeys(Stage stage, Scene scene) {
+        scene.setOnKeyPressed(e -> {
+            if (e.getCode() == javafx.scene.input.KeyCode.F11) {
+                stage.setFullScreen(!stage.isFullScreen());
+            } else if (e.getCode() == javafx.scene.input.KeyCode.ESCAPE && stage.isFullScreen()) {
+                stage.setFullScreen(false);
+            }
+        });
+        stage.fullScreenProperty().addListener((o, was, full) -> {
+            Prefs.get().put("win.full", full).apply();
+            if (!full) saveWindowGeometry(stage);
+        });
+        stage.maximizedProperty().addListener((o, was, max) -> {
+            Prefs.get().put("win.max", max).apply();
+            if (!max) saveWindowGeometry(stage);
+        });
+    }
+
+    /** Persist the current window bounds (skipped while maximized/fullscreen). */
+    private static void saveWindowGeometry(Stage stage) {
+        try {
+            Prefs p = Prefs.get();
+            if (!stage.isFullScreen() && !stage.isMaximized() && stage.getWidth() > 0) {
+                p.put("win.w", (int) stage.getWidth());
+                p.put("win.h", (int) stage.getHeight());
+                p.put("win.x", (int) stage.getX());
+                p.put("win.y", (int) stage.getY());
+            }
+            p.put("win.max", stage.isMaximized());
+            p.put("win.full", stage.isFullScreen());
+            p.apply();
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static boolean fitsOnScreen(double x, double y, double w, double h) {
+        if (x == Integer.MIN_VALUE || y == Integer.MIN_VALUE) return false;
+        for (javafx.stage.Screen s : javafx.stage.Screen.getScreens()) {
+            javafx.geometry.Rectangle2D b = s.getVisualBounds();
+            if (x + 60 > b.getMinX() && x < b.getMaxX() - 60
+                    && y + 40 > b.getMinY() && y < b.getMaxY() - 40) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /* ================= resilient page loading ================= */
