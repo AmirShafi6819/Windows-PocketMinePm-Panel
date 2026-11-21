@@ -468,19 +468,25 @@ public class DesktopApp extends Application {
                     java.nio.charset.StandardCharsets.UTF_8).trim();
         } catch (Throwable ignored) {
         }
-        if (!wanted.equals(have)) {
+        boolean sameVersion = wanted.equals(have);
+        if (!sameVersion) {
             deleteRec(resRoot);
             //noinspection ResultOfMethodCallIgnored
             resRoot.mkdirs();
         }
-        extractDir("www", new File(resRoot, "www"));
-        extractDir("assets", new File(resRoot, "assets"));
+        /* PERF: version.txt is written AFTER a full, complete extraction, so a
+         * matching stamp proves every file is already on disk. Re-extracting
+         * ~9 MB (phar + fonts + panel assets) on EVERY launch - each file
+         * re-scanned by antivirus - was the main startup stall. On the normal
+         * path we now only extract files that are actually missing. */
+        extractDir("www", new File(resRoot, "www"), sameVersion);
+        extractDir("assets", new File(resRoot, "assets"), sameVersion);
         try (OutputStream out = new FileOutputStream(stamp)) {
             out.write(wanted.getBytes(java.nio.charset.StandardCharsets.UTF_8));
         }
     }
 
-    private static void extractDir(String resDir, File destDir) throws IOException {
+    private static void extractDir(String resDir, File destDir, boolean skipExisting) throws IOException {
         // resource listing via a manifest: jar listing is not portable, so the
         // build writes www-files.txt / assets-files.txt next to the resources.
         try (InputStream in = DesktopApp.class.getResourceAsStream("/" + resDir + "-files.txt")) {
@@ -499,6 +505,7 @@ public class DesktopApp extends Application {
                 File out = new File(destDir, rel.replace('/', File.separatorChar));
                 //noinspection ResultOfMethodCallIgnored
                 out.getParentFile().mkdirs();
+                if (skipExisting && out.isFile() && out.length() > 0) continue;
                 try (InputStream rin = DesktopApp.class.getResourceAsStream(resPath);
                      OutputStream rout = new FileOutputStream(out)) {
                     if (rin == null) throw new IOException("missing resource: " + resPath);

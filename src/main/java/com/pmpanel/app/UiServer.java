@@ -55,7 +55,10 @@ public final class UiServer {
             port = server.getAddress().getPort();
         }
         server.createContext("/", this::handle);
-        server.setExecutor(Executors.newFixedThreadPool(2, r -> {
+        /* PERF: the WebView loads the panel in parallel requests (css, 10 js
+         * files, fonts, icons). Two worker threads serialized that burst and
+         * stretched the first paint; 8 lets the whole UI arrive in one wave. */
+        server.setExecutor(Executors.newFixedThreadPool(8, r -> {
             Thread t = new Thread(r, "pm-ui-server");
             t.setDaemon(true);
             return t;
@@ -79,7 +82,7 @@ public final class UiServer {
         // path traversal guard
         if (!f.getCanonicalPath().startsWith(root.getCanonicalPath() + File.separator)
                 && !f.getCanonicalPath().equals(root.getCanonicalPath())) {
-            send(ex, 404, "text/plain", "not found".getBytes(StandardCharsets.UTF_8));
+            send(ex, 404, "text/plain", "not found".getBytes(StandardCharsets.UTF_8), true);
             return;
         }
         if (!f.isFile()) {
@@ -89,22 +92,22 @@ public final class UiServer {
             byte[] cp = classpathResource("/www" + path);
             if (cp != null) {
                 if (path.endsWith("/index.html") || "/index.html".equals(path)) {
-                    send(ex, 200, "text/html; charset=utf-8", injectShim(cp));
+                    send(ex, 200, "text/html; charset=utf-8", injectShim(cp), true);
                 } else {
-                    send(ex, 200, contentType(path), cp);
+                    send(ex, 200, contentType(path), cp, false);
                 }
                 DesktopApp.appendCrashLog("ui: served from jar fallback: " + path);
                 return;
             }
-            send(ex, 404, "text/plain", "not found".getBytes(StandardCharsets.UTF_8));
+            send(ex, 404, "text/plain", "not found".getBytes(StandardCharsets.UTF_8), true);
             return;
         }
         if (path.endsWith("/index.html")) {
             byte[] html = readFile(f);
-            send(ex, 200, "text/html; charset=utf-8", injectShim(html));
+            send(ex, 200, "text/html; charset=utf-8", injectShim(html), true);
             return;
         }
-        send(ex, 200, contentType(path), readFile(f));
+        send(ex, 200, contentType(path), readFile(f), false);
     }
 
     private static byte[] classpathResource(String resPath) {
@@ -257,9 +260,15 @@ public final class UiServer {
         return "application/octet-stream";
     }
 
-    private static void send(HttpExchange ex, int code, String type, byte[] body) throws IOException {
+    private static void send(HttpExchange ex, int code, String type, byte[] body,
+                             boolean noCache) throws IOException {
         ex.getResponseHeaders().set("Content-Type", type);
-        ex.getResponseHeaders().set("Cache-Control", "no-cache");
+        /* PERF: static panel assets (css/js/fonts/icons) are version-stamped
+         * by the app version stamp on disk, so the engine can keep them for a
+         * day instead of re-fetching everything on every reload. The shim-
+         * injected index.html stays no-cache so boot always gets fresh. */
+        ex.getResponseHeaders().set("Cache-Control",
+                noCache ? "no-cache" : "max-age=86400");
         ex.sendResponseHeaders(code, body.length);
         try (OutputStream os = ex.getResponseBody()) {
             os.write(body);

@@ -657,19 +657,32 @@ public class ServerManager {
         long last;
         synchronized (consoleLock) {
             last = seq;
-            for (String entry : consoleLines) {
+            /* PERF: the buffer is seq-ordered (addConsole appends with seq++).
+             * Scanning BACKWARDS stops at the first line the caller already
+             * has, so a poll costs O(new lines) instead of re-parsing the
+             * whole 6000-line buffer every 1.3s on the UI-blocking bridge. */
+            java.util.Iterator<String> it = consoleLines.descendingIterator();
+            java.util.ArrayList<long[]> seqs = new java.util.ArrayList<>();
+            java.util.ArrayList<String> texts = new java.util.ArrayList<>();
+            while (it.hasNext()) {
+                String entry = it.next();
                 int i = entry.indexOf('\u0001');
                 if (i <= 0) continue;
+                long s;
                 try {
-                    long s = Long.parseLong(entry.substring(0, i));
-                    if (s > after) {
-                        JSONArray pair = new JSONArray();
-                        pair.put(s);
-                        pair.put(entry.substring(i + 1));
-                        arr.put(pair);
-                    }
+                    s = Long.parseLong(entry.substring(0, i));
                 } catch (NumberFormatException ignored) {
+                    continue;
                 }
+                if (s <= after) break;
+                seqs.add(new long[]{s});
+                texts.add(entry.substring(i + 1));
+            }
+            for (int k = seqs.size() - 1; k >= 0; k--) {
+                JSONArray pair = new JSONArray();
+                pair.put(seqs.get(k)[0]);
+                pair.put(texts.get(k));
+                arr.put(pair);
             }
         }
         JSONObject res = new JSONObject();
@@ -720,18 +733,38 @@ public class ServerManager {
         return res;
     }
 
+    /* PERF: status() runs on every 1.3s poll; reading + parsing
+     * server.properties each time stalled the UI thread on slow disks.
+     * The value is cached for 60s (it only changes when the user edits the
+     * file, and the live player list overrides it anyway once known). */
+    private int maxPlayersCache = -1;
+    private long maxPlayersAt = 0;
+
     private int maxPlayersFromProps() {
+        long now = System.currentTimeMillis();
+        if (maxPlayersCache > 0 && now - maxPlayersAt < 60_000) return maxPlayersCache;
+        int fallback = 20;
         try {
             File f = new File(serverDir, "server.properties");
-            if (!f.isFile()) return 20;
+            if (!f.isFile()) {
+                maxPlayersCache = fallback;
+                maxPlayersAt = now;
+                return fallback;
+            }
             for (String line : java.nio.file.Files.readAllLines(f.toPath(), StandardCharsets.UTF_8)) {
                 if (line.startsWith("max-players=")) {
-                    return Integer.parseInt(line.substring(12).trim());
+                    try {
+                        fallback = Math.max(1, Integer.parseInt(line.substring(12).trim()));
+                    } catch (NumberFormatException ignored) {
+                    }
+                    break;
                 }
             }
         } catch (Throwable ignored) {
         }
-        return 20;
+        maxPlayersCache = fallback;
+        maxPlayersAt = now;
+        return fallback;
     }
 
     /** CPU% of the php process (PowerShell probe deltas on Windows). */

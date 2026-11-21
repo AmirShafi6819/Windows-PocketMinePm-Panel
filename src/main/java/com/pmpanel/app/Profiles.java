@@ -261,18 +261,36 @@ public final class Profiles {
         if (validId(id)) prefs().put("activeProfile", id).apply();
     }
 
+    /* PERF: profiles.list() runs on every 1.3s poll; re-reading and parsing
+     * server.properties for every profile each time stalled the UI thread.
+     * The parsed port is cached per directory and re-checked only when the
+     * file's mtime changes (one stat() instead of a full read+parse). */
+    private static final java.util.Map<String, long[]> PORT_CACHE =
+            new java.util.concurrent.ConcurrentHashMap<>(); // path -> [mtime, port]
+
     /** server-port from <dir>/server.properties (0 when unknown). */
     public static int readPort(File dir) {
         try {
             File f = new File(dir, "server.properties");
             if (!f.isFile()) return 0;
+            String key = f.getAbsolutePath();
+            long mtime = f.lastModified();
+            long[] c = PORT_CACHE.get(key);
+            if (c != null && c[0] == mtime) return (int) c[1];
+            int port = 0;
             java.util.List<String> lines = java.nio.file.Files.readAllLines(
                     f.toPath(), java.nio.charset.StandardCharsets.UTF_8);
             for (String line : lines) {
                 if (line.startsWith("server-port=")) {
-                    return Integer.parseInt(line.substring(12).trim());
+                    try {
+                        port = Integer.parseInt(line.substring(12).trim());
+                    } catch (NumberFormatException ignored) {
+                    }
+                    break;
                 }
             }
+            PORT_CACHE.put(key, new long[]{mtime, port});
+            return port;
         } catch (Throwable ignored) {
         }
         return 0;

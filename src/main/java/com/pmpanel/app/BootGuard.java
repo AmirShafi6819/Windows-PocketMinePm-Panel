@@ -255,16 +255,31 @@ final class BootGuard {
         }
     }
 
-    /** Relaunch the packaged exe (or gradle run) with the software pipeline. */
+    /**
+     * Relaunch the packaged exe (or gradle run) with a render fix.
+     *
+     * PERF LADDER (fast mode first, slow mode last):
+     *   1. -Dprism.dirtyopts=false   -> keeps the GPU pipeline, cures most
+     *      white-scene driver bugs (composited dirty-region uploads).
+     *   2. -Dprism.order=sw          -> full software rendering. It ALWAYS
+     *      renders, but a fullscreen WebView becomes heavy - so it is the
+     *      LAST step, only after the fast step provably failed too.
+     * Each step has its own flag file with the shared cooldown so the ladder
+     * advances at most one step per cooldown window.
+     */
     private static void relaunchSoftware(LoadFallback fallback) {
-        File flag = new File(AppDirs.filesDir(), "sw-mode.flag");
+        File swFlag = new File(AppDirs.filesDir(), "sw-mode.flag");
+        File gpuFlag = new File(AppDirs.filesDir(), "gpu-safe-mode.flag");
+        boolean gpuStepTried = gpuFlag.isFile();
+
+        File flag = gpuStepTried ? swFlag : gpuFlag;
         long now = System.currentTimeMillis();
         if (flag.isFile()) {
             try {
                 long ts = Long.parseLong(new String(java.nio.file.Files.readAllBytes(flag.toPath()),
                         java.nio.charset.StandardCharsets.UTF_8).trim());
                 if (now - ts < RELAUNCH_COOLDOWN_MS) {
-                    DesktopApp.appendCrashLog("boot: software-mode relaunch already tried recently - showing error page");
+                    DesktopApp.appendCrashLog("boot: relaunch already tried recently - showing error page");
                     fallback.showRecoveryPage();
                     return;
                 }
@@ -277,6 +292,7 @@ final class BootGuard {
         } catch (Throwable ignored) {
         }
 
+        boolean fullSw = gpuStepTried;
         String exe = System.getProperty("jpackage.app-path");
         java.util.List<String> cmd = new java.util.ArrayList<>();
         if (exe != null && new File(exe).isFile()) {
@@ -286,15 +302,19 @@ final class BootGuard {
             String cp = System.getProperty("java.class.path");
             cmd.add(System.getProperty("java.home") + java.io.File.separator + "bin"
                     + java.io.File.separator + (File.separatorChar == '\\' ? "java.exe" : "java"));
-            cmd.add("-Dprism.order=sw");
+            if (fullSw) cmd.add("-Dprism.order=sw");
+            else cmd.add("-Dprism.dirtyopts=false");
             if (cp != null && !cp.isEmpty()) cmd.add("-cp");
             if (cp != null && !cp.isEmpty()) cmd.add(cp);
             cmd.add(DesktopApp.class.getName().replace('.', '/').replace('/', '.'));
         }
-        cmd.add("-J-Dprism.order=sw");
+        if (fullSw) {
+            cmd.add("-J-Dprism.order=sw");
+        }
         cmd.add("-J-Dprism.dirtyopts=false");
 
-        DesktopApp.appendCrashLog("boot: relaunching with software rendering: " + cmd);
+        DesktopApp.appendCrashLog("boot: relaunching render fix (full software="
+                + fullSw + "): " + cmd);
         try {
             new ProcessBuilder(cmd).directory(new File(".").getAbsoluteFile()).start();
         } catch (Throwable t) {

@@ -234,7 +234,8 @@ function animateViewIn(root) {
   const kids = root.children;
   for (let i = 0; i < kids.length; i++) {
     kids[i].classList.add('view-in');
-    kids[i].style.animationDelay = Math.min(i * 60, 320) + 'ms';
+    /* PERF: shorter stagger - the old 320ms tail stretched every render */
+    kids[i].style.animationDelay = Math.min(i * 30, 120) + 'ms';
   }
 }
 
