@@ -20,6 +20,18 @@ dependencies {
     implementation 'org.json:json:20240303'
 }
 
+/* CI (and local setup scripts) place the two native payloads into
+   build/native: php-windows.zip (official pmmp runtime) + pmbot.exe
+   (fake-player engine). They must ship INSIDE the app jar so
+   Installer.ensureBinaries() can extract them on the user's machine. */
+sourceSets {
+    main {
+        resources {
+            srcDir layout.buildDirectory.dir('native')
+        }
+    }
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
