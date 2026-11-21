@@ -164,19 +164,29 @@ public final class UiServer {
         "@font-face{font-family:Vazirmatn;src:url(\"fonts/Vazirmatn-Bold.ttf\") format(\"truetype\");font-weight:700;font-display:swap}';\n" +
         "    document.head.appendChild(st);\n" +
         "  } catch (e) {}\n" +
-        "  /* Defer app boot until the native bridge exists so the first screen is real */\n" +
+        "  /* Defer app boot until the native bridge exists so the first screen is real.\n" +
+        "     The queued DOMContentLoaded listeners are called DIRECTLY once the bridge\n" +
+        "     is attached (re-registering them would never fire: the event has already\n" +
+        "     happened by the time the load worker reports SUCCEEDED). */\n" +
         "  try {\n" +
         "    var proto = Document.prototype;\n" +
         "    var real = proto.addEventListener;\n" +
         "    proto.__pmReal = real;\n" +
         "    proto.addEventListener = function (type, fn, opts) {\n" +
-        "      if (type === 'DOMContentLoaded' && !window.__pmBridgeReady) {\n" +
-        "        var self = this;\n" +
-        "        (document.__pmDcl = document.__pmDcl || []).push(function () { real.call(self, type, fn, opts); });\n" +
+        "      if (type === 'DOMContentLoaded' && !window.__pmBridgeReady && typeof fn === 'function') {\n" +
+        "        (document.__pmDcl = document.__pmDcl || []).push(fn);\n" +
         "        return;\n" +
         "      }\n" +
         "      return real.call(this, type, fn, opts);\n" +
         "    };\n" +
+        "  } catch (e) {}\n" +
+        "  /* capture any boot error so the watchdog card can show something useful */\n" +
+        "  try {\n" +
+        "    window.addEventListener('error', function (ev) {\n" +
+        "      if (window.__pmBootError) return;\n" +
+        "      if (ev && ev.error && ev.error.message) window.__pmBootError = String(ev.error.message);\n" +
+        "      else if (ev && ev.message) window.__pmBootError = String(ev.message);\n" +
+        "    });\n" +
         "  } catch (e) {}\n" +
         "  /* failsafe: if the bridge never shows up within 6s, boot anyway (dev mock) */\n" +
         "  setTimeout(function () {\n" +
@@ -185,12 +195,39 @@ public final class UiServer {
         "  }, 6000);\n" +
         "  window.__pmFireBoot = fireQueued;\n" +
         "  function fireQueued() {\n" +
+        "    if (window.__pmBridgeReady) return;\n" +
         "    window.__pmBridgeReady = true;\n" +
         "    try { Document.prototype.addEventListener = Document.prototype.__pmReal; } catch (e) {}\n" +
         "    var q = document.__pmDcl || [];\n" +
         "    document.__pmDcl = [];\n" +
-        "    for (var i = 0; i < q.length; i++) { try { q[i](); } catch (e) {} }\n" +
+        "    var ev = { type: 'DOMContentLoaded', target: document };\n" +
+        "    for (var i = 0; i < q.length; i++) {\n" +
+        "      try { q[i].call(document, ev); }\n" +
+        "      catch (e) { if (!window.__pmBootError) window.__pmBootError = String(e && e.message || e); }\n" +
+        "    }\n" +
         "  }\n" +
+        "  /* last-resort watchdog: if the view is still empty after 10s, paint a\n" +
+        "     readable self-diagnosis card instead of a silent empty window */\n" +
+        "  setTimeout(function () {\n" +
+        "    try {\n" +
+        "      var v = document.querySelector('#view');\n" +
+        "      if (!v || v.children.length > 0) return;\n" +
+        "      var err = window.__pmBootError || 'unknown';\n" +
+        "      var box = document.createElement('div');\n" +
+        "      box.setAttribute('dir', 'rtl');\n" +
+        "      box.style.cssText = 'margin:60px auto;max-width:620px;padding:26px;border-radius:20px;' +\n" +
+        "        'background:#101218;border:1px solid rgba(255,255,255,.1);color:#fafafa;' +\n" +
+        "        'font-family:Vazirmatn,sans-serif;font-size:14px;line-height:2';\n" +
+        "      box.innerHTML = '<div style=\"font-size:17px;font-weight:700;margin-bottom:10px\">' +\n" +
+        "        'رابط کاربری بارگیری نشد · UI failed to boot</div>' +\n" +
+        "        '<div style=\"color:#a3a8b8;margin-bottom:12px\">برنامه را ببندید و دوباره باز کنید. اگر تکرار شد، این پیام را همراه گزارش خطا بفرستید:<br>' +\n        'Close and reopen the app. If it repeats, please report this error:</div>' +\n" +
+        "        '<pre style=\"white-space:pre-wrap;background:#0b0d14;border-radius:10px;padding:12px;' +\n" +
+        "        'color:#f5a524;direction:ltr;text-align:left;font-size:12px\">' +\n" +
+        "        String(err).replace(/[<&>]/g, function (c) { return { '<': '&lt;', '&': '&amp;', '>': '&gt;' }[c]; }) +\n" +
+        "        '</pre>';\n" +
+        "      v.appendChild(box);\n" +
+        "    } catch (e) {}\n" +
+        "  }, 10000);\n" +
         "})();\n" +
         "</script>\n";
 

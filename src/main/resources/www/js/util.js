@@ -2,6 +2,37 @@
 
 'use strict';
 
+/* ---------- storage safety net (MUST run before any localStorage use) ----------
+ * The desktop engine can expose localStorage as null (WebKit fails to open the
+ * user-data directory when it is locked by another instance or left locked by
+ * a killed process). i18n.js and several views read localStorage at load time;
+ * one null there would kill boot and show an empty window. Probe first: if the
+ * real store works, keep it untouched; otherwise install an in-memory shim so
+ * the app always boots (settings just do not persist for that session). */
+(function () {
+  try {
+    if (typeof window.localStorage === 'undefined' || !window.localStorage) throw 0;
+    window.localStorage.setItem('__pm_probe', '1');
+    if (window.localStorage.getItem('__pm_probe') !== '1') throw 0;
+    window.localStorage.removeItem('__pm_probe');
+    return; /* real storage is fine */
+  } catch (e) { /* fall through to the shim */ }
+  let mem = Object.create(null);
+  const shim = {
+    getItem: (k) => (Object.prototype.hasOwnProperty.call(mem, String(k)) ? mem[String(k)] : null),
+    setItem: (k, v) => { mem[String(k)] = String(v); },
+    removeItem: (k) => { delete mem[String(k)]; },
+    clear: () => { mem = Object.create(null); },
+    key: (i) => (Object.keys(mem)[i] || null),
+    get length() { return Object.keys(mem).length; },
+  };
+  try {
+    Object.defineProperty(window, 'localStorage', { get: () => shim, configurable: true });
+  } catch (e2) {
+    try { window.localStorage = shim; } catch (e3) { /* nothing else we can do */ }
+  }
+})();
+
 /* ---------- tiny DOM helpers ---------- */
 function h(tag, attrs, ...children) {
   const el = document.createElement(tag);
