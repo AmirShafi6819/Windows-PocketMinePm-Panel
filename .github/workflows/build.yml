@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      PMPANEL_VERSION: 2.8.2
+      PMPANEL_VERSION: 2.8.3
       GOTOOLCHAIN: auto
     steps:
       - name: Checkout
@@ -116,6 +116,13 @@ jobs:
             ## Downloads
             - **PMPanel-Setup-${{ env.PMPANEL_VERSION }}-x64.exe** - recommended installer (per-user, no admin rights needed)
             - **PMPanel-${{ env.PMPANEL_VERSION }}-portable-win64.zip** - portable version, just unzip and run PMPanel.exe
+
+            ## What's new in 2.8.3 - performance & polish
+            - **Much smoother UI:** the console poll now scans only the new lines instead of the whole 6000-line buffer, and server.properties reads are cached - no more periodic UI stalls
+            - **Fast startup:** the ~9 MB resource extraction is skipped when the app files are already on disk
+            - **Lighter rendering:** all heavy glass blur effects replaced with identical-looking opaque fills; faster view transitions
+            - **True desktop layout:** from 1100px window width the dock becomes a sidebar with tab labels, content uses the full width, dialogs center themselves, and everything gets mouse hover states (F11 still toggles fullscreen; below 1100px the phone layout is unchanged)
+            - **License & attribution:** MIT LICENSE added; forked from [Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel) by EXBYPIXEL
 
             ## Requirements
             - Windows 10 / 11 (x64)
