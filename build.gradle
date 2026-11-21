@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.pmpanel'
-version = '2.8.0'
+version = '2.8.1'
 
 repositories {
     mavenCentral()
@@ -99,7 +99,7 @@ tasks.register('jpackageApp', Exec) {
                    '--name', 'PMPanel',
                    '--dest', jpkgDir.get().asFile.absolutePath,
                    '--input', jpkgInput.get().asFile.absolutePath,
-                   '--main-jar', 'PMPanel-2.8.0.jar',
+                   '--main-jar', tasks.jar.archiveFileName.get(),
                    '--main-class', 'com.pmpanel.app.DesktopApp',
                    '--runtime-image', jlinkDir.get().asFile.absolutePath,
                    '--icon', file('installer/pmpanel.ico').absolutePath,

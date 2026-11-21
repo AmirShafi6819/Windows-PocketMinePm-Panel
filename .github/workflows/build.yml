@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      PMPANEL_VERSION: 2.8.0
+      PMPANEL_VERSION: 2.8.1
       GOTOOLCHAIN: auto
     steps:
       - name: Checkout
@@ -86,18 +86,18 @@ jobs:
           PMPANEL_APPDIR: ${{ github.workspace }}\build\jpackage\PMPanel
         run: |
           & "${{ steps.inno.outputs.path }}" installer\pminesetup.iss
-          if (-not (Test-Path "build\installer-out\PMPanel-Setup-2.8.0-x64.exe")) { throw "installer missing" }
+          if (-not (Test-Path "build\installer-out\PMPanel-Setup-$env:PMPANEL_VERSION-x64.exe")) { throw "installer missing" }
 
       - name: Build portable zip
         shell: pwsh
         run: |
-          Compress-Archive -Path build\jpackage\PMPanel -DestinationPath build\installer-out\PMPanel-2.8.0-portable-win64.zip
+          Compress-Archive -Path build\jpackage\PMPanel -DestinationPath "build\installer-out\PMPanel-$env:PMPANEL_VERSION-portable-win64.zip"
           Get-ChildItem build\installer-out
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: PMPanel-Windows-2.8.0
+          name: PMPanel-Windows-${{ env.PMPANEL_VERSION }}
           path: |
             build\installer-out\*.exe
             build\installer-out\*.zip
@@ -108,14 +108,14 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            build\installer-out\PMPanel-Setup-2.8.0-x64.exe
-            build\installer-out\PMPanel-2.8.0-portable-win64.zip
+            build\installer-out\PMPanel-Setup-${{ env.PMPANEL_VERSION }}-x64.exe
+            build\installer-out\PMPanel-${{ env.PMPANEL_VERSION }}-portable-win64.zip
           body: |
             PM Panel for Windows - run a Minecraft Bedrock server (PocketMine-MP) locally.
 
             ## Downloads
-            - **PMPanel-Setup-2.8.0-x64.exe** - recommended installer (per-user, no admin rights needed)
-            - **PMPanel-2.8.0-portable-win64.zip** - portable version, just unzip and run PMPanel.exe
+            - **PMPanel-Setup-${{ env.PMPANEL_VERSION }}-x64.exe** - recommended installer (per-user, no admin rights needed)
+            - **PMPanel-${{ env.PMPANEL_VERSION }}-portable-win64.zip** - portable version, just unzip and run PMPanel.exe
 
             ## Requirements
             - Windows 10 / 11 (x64)

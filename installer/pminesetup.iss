@@ -1,7 +1,7 @@
 ; Inno Setup script: wraps the jpackage app image into a single Setup.exe
 ; Per-user install (no UAC) - friendly for a personal server panel.
 ; Paths are relative to this file's folder (installer/).
-; Env vars used: PMPANEL_VERSION (e.g. 2.8.0), PMPANEL_APPDIR (path to the jpackage image).
+; Env vars used: PMPANEL_VERSION (e.g. 2.8.1), PMPANEL_APPDIR (path to the jpackage image).
 
 #define AppName "PM Panel"
 #define AppVersion GetEnv('PMPANEL_VERSION')
