@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="Project logo" width="72">
+  <img src="assets/logo.png" alt="Project logo" width="88">
 </p>
 
 <p align="center">
@@ -13,9 +13,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/stargazers"><img src="https://img.shields.io/github/stars/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=8b5cf6&label=Stars" alt="GitHub stars"></a>
-  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/network/members"><img src="https://img.shields.io/github/forks/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=06b6d4&label=Forks" alt="GitHub forks"></a>
-  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/issues"><img src="https://img.shields.io/github/issues/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=f59e0b&label=Issues" alt="GitHub issues"></a>
+  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/stargazers"><img src="https://img.shields.io/github/stars/AmirShafi6819/Windows-PacketMinePm-Panel?style=for-the-badge&color=8b5cf6&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/network/members"><img src="https://img.shields.io/github/forks/AmirShafi6819/Windows-PacketMinePm-Panel?style=for-the-badge&color=06b6d4&label=Forks" alt="GitHub forks"></a>
+  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases"><img src="https://img.shields.io/github/v/release/AmirShafi6819/Windows-PacketMinePm-Panel?style=for-the-badge&color=17c964&label=Release" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/Windows-10%2B%20x64-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows 10+">
 </p>
 
@@ -29,12 +29,16 @@ The whole panel UI, every feature and every tool of the Android app is preserved
 
 ## 📥 Releases — Start here
 
-Visit the [Releases page](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases) and download:
+Open the [Releases page](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases) and download **one** of these:
 
-- **`PMPanel-Setup-x.y.z-x64.exe`** - the installer (per-user install, no admin rights required)
-- **`PMPanel-x.y.z-portable-win64.zip`** - the portable version; unzip anywhere and run `PMPanel.exe`
+| File | What it is |
+| --- | --- |
+| `PMPanel-Setup-x.y.z-x64.exe` | The installer - per-user install, no admin rights required, Start-menu shortcut |
+| `PMPanel-x.y.z-portable-win64.zip` | The portable version - unzip anywhere and run `PMPanel.exe` inside |
 
-Everything is bundled: the Windows PHP runtime (official pmmp build), PocketMine-MP and the fake-player engine. No Java, no PHP, no dependencies to install.
+Everything is bundled: the Windows PHP runtime (official pmmp build), PocketMine-MP and the fake-player engine. No Java, no PHP, no other dependencies to install.
+
+> **SmartScreen note:** the binaries are unsigned. If Windows SmartScreen shows a warning, click **More info → Run anyway**. This is normal for open-source apps without a code-signing certificate.
 
 ## 🚀 Features (identical to the Android app)
 
@@ -48,15 +52,26 @@ Everything is bundled: the Windows PHP runtime (official pmmp build), PocketMine
 - 🛒 Poggit plugin market with icons, READMEs and one-click install
 - 🌐 Public IP / UPnP port mapping, connectivity self-test, RCON console, GS4 query stats
 - 📊 Live statistics: TPS, CPU & RAM of the server process, online players, network I/O
-- 🔔 System tray icon keeps the server running in the background when you close the window - with a "stop all servers" shortcut
+- 🪟 **Desktop niceties added by the port:** opens maximized with a resizable/responsive layout, `F11` for true Windows fullscreen, and a system tray icon keeps the server running in the background when you close the window (with a "stop all servers" shortcut)
 
 ## 🛠️ Getting Started
 
-1. Open **[Releases](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases)** and install the Setup exe (or unzip the portable version).
+1. Download the **Setup exe** from [Releases](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases) and run it (or unzip the portable version).
 2. Launch **PM Panel** from the Start menu (or `PMPanel.exe`).
-3. Select the version you want in the panel, press **Start**, and share your address (see the network tools in the Tools tab).
+3. Pick your language, select the server version you want in the panel, press **Start**, and share your address (see the network tools in the Tools tab).
+4. Friends join from the same network with `your-ip:19132`; use the Public-IP / UPnP tool to go online.
 
-> Data (servers, worlds, plugins, settings) lives in `%APPDATA%\PMPanel` - same layout as the Android app's private storage.
+> Data (servers, worlds, plugins, settings) lives in `%APPDATA%\PMPanel` - same layout as the Android app's private storage. Diagnostics go to `%APPDATA%\PMPanel\logs\app-crash.log`.
+
+## 🩺 Troubleshooting
+
+| Problem | What to do |
+| --- | --- |
+| Window opens white / empty | Fixed automatically since 2.8.1: the app detects a failed render and relaunches itself in software-rendering mode, and falls back to a backup copy of the UI if the local server is blocked. If you still see it, just restart the app once. |
+| App does not open at all | Check `%APPDATA%\PMPanel\logs\app-crash.log`, then delete `%LOCALAPPDATA%\PMPanel\app` (extracted UI cache) and start again. |
+| Antivirus complains about `pmbot.exe` / `php.exe` | They are the bundled fake-player engine and the official pmmp PHP runtime - whitelist the `%APPDATA%\PMPanel\bin` folder. |
+| Port 19132 already in use | The panel detects the conflict and moves the server to a free port automatically; check the console note. |
+| Friends cannot connect | Start the connectivity self-test (Tools tab), forward UDP `19132` on your router or use the built-in UPnP tool, and make sure Windows Firewall allows `php.exe`. |
 
 ## 🏗️ How the port works
 
@@ -74,22 +89,40 @@ The panel UI (`www/`) is bundled **byte-identical** to the Android app. A tiny r
 
 ### Build from source
 
-Requirements: JDK 21, Go 1.25+ (for the bot engine).
+Requirements: **JDK 21** and **Go 1.21+** (the Go toolchain version is pinned in `pmbot/go.mod` and downloaded automatically).
 
-```bash
-# build the bot engine (or let CI download/build it)
-cd pmbot && go build -trimpath -ldflags "-s -w" -o ../build/resources-native/native/pmbot.exe .
+**Windows (cmd.exe):**
+
+```bat
+:: 1. build the bot engine (or let CI build it)
+cd pmbot
+go build -trimpath -ldflags "-s -w" -o ..\build\resources-native\native\pmbot.exe .
 cd ..
 
-# fetch the PHP runtime
-curl -L -o build/resources-native/native/php-windows.zip ^
+:: 2. fetch the official PHP runtime
+curl -L -o build\resources-native\native\php-windows.zip ^
   https://github.com/pmmp/PHP-Binaries/releases/download/pm5-php-8.4-latest/PHP-8.4-Windows-x64-PM5.zip
 
-# build the self-contained app image
-gradlew packageApp
+:: 3. build the self-contained app image (jlink + jpackage)
+gradlew.bat packageApp
+:: result: build\jpackage\PMPanel\PMPanel.exe
 ```
 
-CI (`.github/workflows/build.yml`) builds everything on a Windows runner and attaches the installer + portable zip to every `v*` release.
+**Linux / macOS (cross-compile the bot engine for Windows):**
+
+```bash
+cd pmbot
+GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "-s -w" -o ../build/resources-native/native/pmbot.exe .
+cd ..
+
+mkdir -p build/resources-native/native
+curl -L -o build/resources-native/native/php-windows.zip \
+  https://github.com/pmmp/PHP-Binaries/releases/download/pm5-php-8.4-latest/PHP-8.4-Windows-x64-PM5.zip
+
+./gradlew packageApp
+```
+
+CI (`.github/workflows/build.yml`) builds everything on a Windows runner on every push and attaches the installer + portable zip to every `v*` release tag.
 
 ## 🤝 Contributions and Issues
 
