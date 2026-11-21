@@ -7,15 +7,15 @@
 </p>
 
 <p align="center">
-  <strong>The Windows port of Android-PacketMinePm-Panel.</strong>
+  <strong>The Windows port of Android PacketMine Panel.</strong>
   <br>
   Run a Minecraft Bedrock server locally on your Windows PC with PocketMine-MP - a native desktop app, no phone required.
 </p>
 
 <p align="center">
-  <a href="https://github.com/EXBYPIXEL/Windows-PacketMinePm-Panel/stargazers"><img src="https://img.shields.io/github/stars/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=8b5cf6&label=Stars" alt="GitHub stars"></a>
-  <a href="https://github.com/EXBYPIXEL/Windows-PacketMinePm-Panel/network/members"><img src="https://img.shields.io/github/forks/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=06b6d4&label=Forks" alt="GitHub forks"></a>
-  <a href="https://github.com/EXBYPIXEL/Windows-PacketMinePm-Panel/issues"><img src="https://img.shields.io/github/issues/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=f59e0b&label=Issues" alt="GitHub issues"></a>
+  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/stargazers"><img src="https://img.shields.io/github/stars/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=8b5cf6&label=Stars" alt="GitHub stars"></a>
+  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/network/members"><img src="https://img.shields.io/github/forks/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=06b6d4&label=Forks" alt="GitHub forks"></a>
+  <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/issues"><img src="https://img.shields.io/github/issues/EXBYPIXEL/Windows-PacketMinePm-Panel?style=for-the-badge&color=f59e0b&label=Issues" alt="GitHub issues"></a>
   <img src="https://img.shields.io/badge/Windows-10%2B%20x64-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows 10+">
 </p>
 
@@ -23,13 +23,13 @@
 
 ## ✨ About
 
-**Windows PacketMinePm Panel** is a 1:1 desktop port of [Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel). It lets you run **PocketMine-MP** locally on a Windows PC and host a **Minecraft Bedrock** server without a separate server machine.
+**Windows PacketMine Panel** is a desktop port of [Android PacketMinePm Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel). It lets you run **PocketMine-MP** locally on a Windows PC and host a **Minecraft Bedrock** server without a separate server machine.
 
 The whole panel UI, every feature and every tool of the Android app is preserved - only the Android plumbing (WebView client, SAF file pickers, foreground service, battery optimizations) was replaced with native Windows equivalents.
 
 ## 📥 Releases — Start here
 
-Visit the [Releases page](https://github.com/EXBYPIXEL/Windows-PacketMinePm-Panel/releases) and download:
+Visit the [Releases page](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases) and download:
 
 - **`PMPanel-Setup-x.y.z-x64.exe`** - the installer (per-user install, no admin rights required)
 - **`PMPanel-x.y.z-portable-win64.zip`** - the portable version; unzip anywhere and run `PMPanel.exe`
@@ -52,7 +52,7 @@ Everything is bundled: the Windows PHP runtime (official pmmp build), PocketMine
 
 ## 🛠️ Getting Started
 
-1. Open **[Releases](https://github.com/EXBYPIXEL/Windows-PacketMinePm-Panel/releases)** and install the Setup exe (or unzip the portable version).
+1. Open **[Releases](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases)** and install the Setup exe (or unzip the portable version).
 2. Launch **PM Panel** from the Start menu (or `PMPanel.exe`).
 3. Select the version you want in the panel, press **Start**, and share your address (see the network tools in the Tools tab).
 
@@ -93,7 +93,7 @@ CI (`.github/workflows/build.yml`) builds everything on a Windows runner and att
 
 ## 🤝 Contributions and Issues
 
-Have a suggestion or found a problem? Open an [issue](https://github.com/EXBYPIXEL/Windows-PacketMinePm-Panel/issues). When reporting a bug, include your Windows version, app version, and steps to reproduce it.
+Have a suggestion or found a problem? Open an [issue](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/issues). When reporting a bug, include your Windows version, app version, and steps to reproduce it.
 
 ## ⭐ Support the Project
 
