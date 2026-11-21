@@ -14,4 +14,5 @@ out/
 Thumbs.db
 
 # Native payloads are downloaded / built by CI, never committed
-build/native/
+build/
+build/resources-native/

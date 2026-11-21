@@ -78,11 +78,11 @@ Requirements: JDK 21, Go 1.25+ (for the bot engine).
 
 ```bash
 # build the bot engine (or let CI download/build it)
-cd pmbot && go build -trimpath -ldflags "-s -w" -o ../build/native/pmbot.exe .
+cd pmbot && go build -trimpath -ldflags "-s -w" -o ../build/resources-native/native/pmbot.exe .
 cd ..
 
 # fetch the PHP runtime
-curl -L -o build/native/php-windows.zip ^
+curl -L -o build/resources-native/native/php-windows.zip ^
   https://github.com/pmmp/PHP-Binaries/releases/download/pm5-php-8.4-latest/PHP-8.4-Windows-x64-PM5.zip
 
 # build the self-contained app image

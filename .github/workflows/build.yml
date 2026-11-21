@@ -36,16 +36,16 @@ jobs:
       - name: Build bot engine (pmbot.exe, GOOS=windows)
         run: |
           cd pmbot
-          go build -trimpath -ldflags "-s -w" -o ../build/native/pmbot.exe .
-          dir ..\build\native
+          go build -trimpath -ldflags "-s -w" -o ../build/resources-native/native/pmbot.exe .
+          dir ..\build\resources-native\native
         shell: cmd
 
       - name: Download official Windows PHP runtime (pmmp/PHP-Binaries)
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path build\native | Out-Null
+          New-Item -ItemType Directory -Force -Path build\resources-native\native | Out-Null
           $url = "https://github.com/pmmp/PHP-Binaries/releases/download/pm5-php-8.4-latest/PHP-8.4-Windows-x64-PM5.zip"
-          $out = "build\native\php-windows.zip"
+          $out = "build\resources-native\native\php-windows.zip"
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
           Invoke-WebRequest -Uri $url -OutFile $out -UserAgent "PMPanel-Windows-CI"
           if ((Get-Item $out).Length -lt 5MB) { throw "PHP download failed" }
