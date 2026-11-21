@@ -20,6 +20,15 @@
   <img src="https://img.shields.io/badge/Windows-10%2B%20x64-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows 10+">
 </p>
 
+<p align="center">
+  <a href="#-screenshots">📸 Screenshots</a> &nbsp;·&nbsp;
+  <a href="#-releases--start-here">📥 Download</a> &nbsp;·&nbsp;
+  <a href="#-features-identical-to-the-android-app">🚀 Features</a> &nbsp;·&nbsp;
+  <a href="#-fork-attribution--منشأ-فورک">🔱 Fork</a> &nbsp;·&nbsp;
+  <a href="#-troubleshooting">🩺 Troubleshooting</a> &nbsp;·&nbsp;
+  <a href="#-license">📄 License</a>
+</p>
+
 ---
 
 ## ✨ About
@@ -27,6 +36,33 @@
 **Windows PacketMine Panel** is a desktop port of [Android PacketMinePm Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel). It lets you run **PocketMine-MP** locally on a Windows PC and host a **Minecraft Bedrock** server without a separate server machine.
 
 The whole panel UI, every feature and every tool of the Android app is preserved - only the Android plumbing (WebView client, SAF file pickers, foreground service, battery optimizations) was replaced with native Windows equivalents.
+
+## 📸 Screenshots · اسکرین‌شات‌ها
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/dashboard.png" alt="Dashboard - live stats, server specs and one-click start">
+      <br><sub><b>📊 Dashboard</b> — live stats, server specs &amp; one-click start</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/console.png" alt="Live server console with command input and quick actions">
+      <br><sub><b>🖥️ Console</b> — real-time commands &amp; quick actions</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/files.png" alt="File manager - browse, upload and edit server files">
+      <br><sub><b>🗂️ File manager</b> — browse, upload &amp; edit server files</sub>
+    </td>
+    <td width="50%" align="center">
+      <img src="docs/screenshots/plugins.png" alt="Poggit plugin market with search, sorting and one-click install">
+      <br><sub><b>🛒 Poggit market</b> — 1,400+ plugins, one-click install</sub>
+    </td>
+  </tr>
+</table>
+
+<p align="center"><sub><i>Dark theme, full RTL Persian UI — exactly as it looks on Windows 10/11.</i></sub></p>
 
 ## 🔱 Fork Attribution · منشأ فورک
 
