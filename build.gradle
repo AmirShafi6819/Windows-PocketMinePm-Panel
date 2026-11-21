@@ -1,0 +1,104 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.pmpanel'
+version = '2.8.0'
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = '21.0.5'
+    modules = ['javafx.controls', 'javafx.web']
+}
+
+dependencies {
+    implementation 'org.json:json:20240303'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+application {
+    mainClass = 'com.pmpanel.app.DesktopApp'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.pmpanel.app.DesktopApp'
+    }
+    archiveBaseName = 'PMPanel'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+/* ---------- desktop packaging (jlink + jpackage) ---------- */
+
+def jlinkDir = layout.buildDirectory.dir('jlink')
+def jpkgDir = layout.buildDirectory.dir('jpackage')
+def jpkgInput = layout.buildDirectory.dir('jpackage/input')
+def fxModulesDir = layout.buildDirectory.dir('fxmodules')
+
+// the JavaFX runtime ships as real modules inside the jlink image,
+// so the launcher classpath must NOT contain the javafx jars again
+tasks.register('copyAppJars', Copy) {
+    dependsOn tasks.jar
+    into jpkgInput
+    from(configurations.runtimeClasspath) {
+        exclude { el -> el.file.name.startsWith('javafx') }
+    }
+    from(tasks.jar)
+}
+
+tasks.register('copyFxModules', Copy) {
+    into fxModulesDir
+    from(configurations.runtimeClasspath) {
+        include { el -> el.file.name.startsWith('javafx') }
+    }
+}
+
+tasks.register('jlinkImage', Exec) {
+    dependsOn tasks.copyAppJars, tasks.copyFxModules
+    doFirst {
+        def mods = ['java.base', 'java.logging', 'java.management', 'java.naming',
+                    'java.desktop', 'java.sql', 'java.xml', 'jdk.unsupported',
+                    'jdk.crypto.ec', 'jdk.crypto.cryptoki',
+                    'javafx.base', 'javafx.graphics', 'javafx.controls', 'javafx.web']
+        def cmd = ['jlink',
+                   '--module-path', fxModulesDir.get().asFile.absolutePath,
+                   '--add-modules', mods.join(','),
+                   '--output', jlinkDir.get().asFile.absolutePath,
+                   '--strip-debug', '--no-header-files', '--no-man-pages']
+        commandLine(cmd)
+    }
+}
+
+tasks.register('jpackageApp', Exec) {
+    dependsOn tasks.jlinkImage
+    doFirst {
+        def cmd = ['jpackage',
+                   '--type', 'app-image',
+                   '--name', 'PMPanel',
+                   '--dest', jpkgDir.get().asFile.absolutePath,
+                   '--input', jpkgInput.get().asFile.absolutePath,
+                   '--main-jar', 'PMPanel-2.8.0.jar',
+                   '--main-class', 'com.pmpanel.app.DesktopApp',
+                   '--runtime-image', jlinkDir.get().asFile.absolutePath,
+                   '--icon', file('installer/pmpanel.ico').absolutePath,
+                   '--app-version', version,
+                   '--vendor', 'PM Panel Project',
+                   '--java-options', '-Dfile.encoding=UTF-8']
+        commandLine(cmd)
+    }
+}
+
+tasks.register('packageApp') {
+    dependsOn tasks.jpackageApp
+    group = 'build'
+    description = 'Builds the self-contained Windows app image (PMPanel/ with launcher exe)'
+}

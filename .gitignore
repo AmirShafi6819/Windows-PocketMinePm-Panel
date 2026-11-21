@@ -1,0 +1,17 @@
+# Build outputs
+build/
+out/
+*.log
+
+# Gradle
+.gradle/
+
+# IDE / OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Native payloads are downloaded / built by CI, never committed
+build/native/
