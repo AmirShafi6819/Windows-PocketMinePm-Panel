@@ -92,7 +92,8 @@ const DICT = {
     /* about */
     about_title: 'درباره', versions: 'نسخه‌ها', licenses: 'مجوزها', storage_usage: 'مصرف فضا',
     links: 'لینک‌ها', credits: 'ساخته‌شده با PHP استاتیک pmmp برای ویندوز',
-    view_license: 'این برنامه PocketMine-MP (LGPL-3.0) و PHP (PHP License) را باندل کرده است.',
+    view_license: 'این برنامه PocketMine-MP (LGPL-3.0) و PHP (PHP License) را باندل کرده است. کد پنل تحت مجوز MIT منتشر شده است (فایل LICENSE در مخزن گیت‌هاب).',
+    forked_from: 'فورک‌شده از (پنل اصلی اندروید)',
     crashdumps: 'کرش‌دامپ‌ها', misc: 'متفرقه',
     /* v2.0.0 tools */
     fakeplayers_title: 'فیک پلیر', compiler_title: 'کامپایلر پلاگین', publicip_title: 'آی‌پی عمومی',
@@ -356,7 +357,8 @@ const DICT = {
     /* about */
     about_title: 'About', versions: 'Versions', licenses: 'Licenses', storage_usage: 'Storage usage',
     links: 'Links', credits: 'Built with pmmp static PHP for Windows',
-    view_license: 'This app bundles PocketMine-MP (LGPL-3.0) and PHP (PHP License).',
+    view_license: 'This app bundles PocketMine-MP (LGPL-3.0) and PHP (PHP License). The panel code is released under the MIT license (see the LICENSE file in the GitHub repo).',
+    forked_from: 'Forked from (original Android panel)',
     crashdumps: 'Crash dumps', misc: 'Misc',
     /* v2.0.0 tools */
     fakeplayers_title: 'Fake Players', compiler_title: 'Plugin Compiler', publicip_title: 'Public IP',

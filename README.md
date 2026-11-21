@@ -16,6 +16,7 @@
   <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/stargazers"><img src="https://img.shields.io/github/stars/AmirShafi6819/Windows-PacketMinePm-Panel?style=for-the-badge&color=8b5cf6&label=Stars" alt="GitHub stars"></a>
   <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/network/members"><img src="https://img.shields.io/github/forks/AmirShafi6819/Windows-PacketMinePm-Panel?style=for-the-badge&color=06b6d4&label=Forks" alt="GitHub forks"></a>
   <a href="https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/releases"><img src="https://img.shields.io/github/v/release/AmirShafi6819/Windows-PacketMinePm-Panel?style=for-the-badge&color=17c964&label=Release" alt="Latest release"></a>
+  <a href="https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel"><img src="https://img.shields.io/badge/Forked_from-EXBYPIXEL%2FAndroid--PacketMinePm--Panel-0969da?style=for-the-badge&logo=github" alt="Forked from Android PacketMinePm Panel"></a>
   <img src="https://img.shields.io/badge/Windows-10%2B%20x64-0078d4?style=for-the-badge&logo=windows&logoColor=white" alt="Windows 10+">
 </p>
 
@@ -26,6 +27,18 @@
 **Windows PacketMine Panel** is a desktop port of [Android PacketMinePm Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel). It lets you run **PocketMine-MP** locally on a Windows PC and host a **Minecraft Bedrock** server without a separate server machine.
 
 The whole panel UI, every feature and every tool of the Android app is preserved - only the Android plumbing (WebView client, SAF file pickers, foreground service, battery optimizations) was replaced with native Windows equivalents.
+
+## 🔱 Fork Attribution · منشأ فورک
+
+**EN:** This project is **forked from [EXBYPIXEL/Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel)** — the original Android panel for running PacketMine (PocketMine-MP) on phones. That project is the source of the panel UI, its features and its design; this repository carries that work over to **Windows** as a native desktop app (JavaFX shell + desktop bridge) and continues its development. All credit for the original panel goes to **EXBYPIXEL**.
+
+**FA (فارسی):** این پروژه **فورک‌شده از [EXBYPIXEL/Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel)** است — پنل اصلی اندروید برای اجرای PacketMine (PocketMine-MP) روی موبایل. رابط کاربری، قابلیت‌ها و طراحی پنل از آن پروژه می‌آید؛ این ریپو همان کار را به **ویندوز** آورده (پوسته دسکتاپ JavaFX + پل ارتباطی دسکتاپ) و توسعه آن را ادامه می‌دهد. تمام اعتبار پنل اصلی متعلق به **EXBYPIXEL** است.
+
+| | Upstream (Android) | This repo (Windows) |
+| --- | --- | --- |
+| Project | [Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel) | [Windows-PacketMinePm-Panel](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel) |
+| Author | EXBYPIXEL | AmirShafi6819 |
+| Platform | Android 5+ (mobile WebView) | Windows 10/11 x64 (JavaFX desktop) |
 
 ## 📥 Releases — Start here
 
@@ -127,6 +140,14 @@ CI (`.github/workflows/build.yml`) builds everything on a Windows runner on ever
 ## 🤝 Contributions and Issues
 
 Have a suggestion or found a problem? Open an [issue](https://github.com/AmirShafi6819/Windows-PacketMinePm-Panel/issues). When reporting a bug, include your Windows version, app version, and steps to reproduce it.
+
+## 📄 License
+
+Released under the **MIT License** — see [LICENSE](LICENSE).
+
+- The **Windows desktop port** is by **AmirShafi6819**.
+- The **original Android panel** and its UI/features are by **EXBYPIXEL** — this being a fork of [Android-PacketMinePm-Panel](https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel), the upstream author is credited in the license.
+- Bundled runtimes keep their own licenses: PocketMine-MP / PHP (LGPL-3.0, pmmp), pmbot fake-player engine (MIT).
 
 ## ⭐ Support the Project
 

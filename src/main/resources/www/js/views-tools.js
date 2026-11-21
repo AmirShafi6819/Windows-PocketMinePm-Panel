@@ -642,6 +642,7 @@ Views.about = (root) => {
   /* links */
   root.appendChild(h('div', { class: 'card' },
     h('div', { class: 'card-title' }, icon('globe'), t('links')),
+    linkBtn(t('forked_from'), 'https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel'),
     linkBtn('NetherGamesMC/PocketMine-MP', 'https://github.com/NetherGamesMC/PocketMine-MP'),
     linkBtn('pmmp/PocketMine-MP', 'https://github.com/pmmp/PocketMine-MP'),
     linkBtn('Poggit plugins', 'https://poggit.pmmp.io/plugins')));

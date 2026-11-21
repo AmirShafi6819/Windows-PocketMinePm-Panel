@@ -1,0 +1,36 @@
+MIT License
+
+Copyright (c) 2026 AmirShafi6819 (Windows desktop port - Windows-PacketMinePm-Panel)
+Copyright (c) 2026 EXBYPIXEL (original Android panel - Android-PacketMinePm-Panel)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+Attribution notice (in addition to the MIT conditions above):
+
+  This repository is a FORK of the Android project
+  "Android-PacketMinePm-Panel" by EXBYPIXEL
+  (https://github.com/EXBYPIXEL/Android-PacketMinePm-Panel), brought to
+  Windows as a native desktop application. The panel UI, its features and
+  its design originate from the upstream Android project and its author is
+  credited above. The Windows port (JavaFX shell, desktop bridge, packaging
+  and all desktop-specific code) is by AmirShafi6819.
+
+  Bundled third-party runtimes keep their own licenses:
+    - PocketMine-MP and the PHP runtime: LGPL-3.0 (pmmp / NetherGamesMC)
+    - pmbot fake-player engine (Go): MIT (upstream Android project)
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
