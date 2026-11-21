@@ -1336,10 +1336,17 @@ a { color: var(--primary-hi); text-decoration: none; }
 
 /* ================= v2.8.1 desktop (Windows port) =================
    The layout below 980px stays the phone layout, byte-for-byte identical
-   to the Android app. From desktop window widths on, every view becomes
-   a centered reading column and the dock turns into a centered floating
-   bar. Nothing is removed: all views, dialogs, dock tabs and console
-   behaviour are unchanged. */
+   to the Android app. From 980px on every view becomes a centered reading
+   column with a centered floating dock. From 1100px on the dock becomes a
+   REAL desktop sidebar (on the reading-start side: right in Persian/RTL,
+   left in English/LTR) with visible tab labels, and the content takes the
+   freed width. Nothing is removed: all views, dialogs, dock tabs and
+   console behaviour are unchanged - only their placement adapts. */
+
+/* dock tab labels exist in the DOM for the desktop sidebar; the phone dock
+   stays icon-only */
+.nav-btn .nav-lb { display: none; }
+
 @media (min-width: 980px) {
   #topbar { padding-inline: 24px; }
   #view { padding-inline: 28px; }
@@ -1354,7 +1361,105 @@ a { color: var(--primary-hi); text-decoration: none; }
   }
   .hero .h-stats { grid-template-columns: repeat(4, 1fr); }
 }
-@media (min-width: 1280px) {
-  #view { padding-inline: 34px; }
-  #view > * { max-width: 1020px; }
+
+/* ---------- real desktop: sidebar navigation + wide content ---------- */
+@media (min-width: 1100px) {
+  #bottomnav {
+    left: auto; right: auto;
+    top: calc(var(--top-h) + 12px);
+    bottom: 12px;
+    width: 218px;
+    height: auto;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 10px;
+    border-radius: 22px;
+    transform: none;
+  }
+  html[dir="rtl"] #bottomnav { right: 12px; left: auto; }
+  html[dir="ltr"] #bottomnav { left: 12px; right: auto; }
+  /* the sliding pill is a phone-dock element; the sidebar uses the filled
+     active row instead (same gradient, same look as the segmented bar) */
+  .nav-indicator { display: none; }
+  .nav-btn {
+    flex: none;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 14px;
+    transition: color 0.25s var(--tr), background 0.25s var(--tr);
+  }
+  .nav-btn .nav-lb {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    min-width: 0;
+    overflow: hidden; text-overflow: ellipsis;
+  }
+  .nav-ic svg { width: 22px; height: 22px; }
+  .nav-btn.active {
+    background: linear-gradient(180deg, #1a7cf5, var(--primary));
+    color: #fff;
+    box-shadow: 0 6px 18px -8px rgba(0, 111, 238, 0.85), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+  .nav-btn.active .nav-ic svg { animation: none; }
+
+  /* content takes the width the dock freed */
+  #view { max-width: none; }
+  html[dir="rtl"] #view { padding-right: calc(218px + 12px + 30px); padding-left: 34px; }
+  html[dir="ltr"] #view { padding-left: calc(218px + 12px + 30px); padding-right: 34px; }
+  #view > * { max-width: 1240px; }
+  #view.fill {
+    /* console: still a full Termux-style screen, but never under the sidebar */
+    padding-inline: 0;
+  }
+  html[dir="rtl"] #view.fill { padding-right: calc(218px + 12px + 14px); padding-left: 14px; }
+  html[dir="ltr"] #view.fill { padding-left: calc(218px + 12px + 14px); padding-right: 14px; }
+
+  /* toasts live above the bottom edge, clear of the sidebar */
+  html[dir="rtl"] #toastRoot { padding-right: calc(218px + 24px); }
+  html[dir="ltr"] #toastRoot { padding-left: calc(218px + 24px); }
+  #toastRoot { bottom: 22px; }
+
+  /* market: two cards per row on a desktop screen */
+  .mk-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(430px, 1fr));
+    gap: 10px;
+  }
+  .mk-card { animation: none; }
+
+  /* action sheets become centered desktop dialogs */
+  .sheet-backdrop { align-items: center; }
+  .sheet {
+    width: min(480px, 90vw);
+    border-radius: 26px;
+    border-bottom: 1px solid var(--border2);
+    max-height: 82vh;
+  }
+  .sheet-grab { display: none; }
+
+  .hero { padding: 28px 26px 24px; }
+  .hero .h-title { font-size: 23px; }
+}
+
+/* mouse affordances (never applied on touch) */
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover { background: var(--panel3); border-color: var(--border2); }
+  .btn.primary:hover, .btn.solid:hover { filter: brightness(1.12); }
+  .nav-btn:hover { color: #cfe0ff; }
+  .nav-btn.active:hover { color: #fff; }
+  .topbar-btn:hover { color: var(--text); background: rgba(255, 255, 255, 0.07); }
+  .icon-btn:hover { background: rgba(255, 255, 255, 0.07); }
+  .fm-row:hover { background: rgba(255, 255, 255, 0.045); }
+  .mk-card:hover { background: var(--panel2); border-color: var(--border2); }
+  .sheet-item:hover { background: var(--panel2); }
+  .fp-chip:hover { background: var(--panel2); }
+  .seg-btn:hover, .segmented button:hover { color: var(--text); }
+  .list-row:hover { background: rgba(255, 255, 255, 0.045); }
 }
