@@ -44,7 +44,7 @@ import java.util.List;
  */
 public class DesktopApp extends Application {
 
-    public static final String APP_VERSION = "2.8.1";
+    public static final String APP_VERSION = "2.8.2";
 
     private static volatile DesktopApp instance;
     private static volatile Stage mainStage;

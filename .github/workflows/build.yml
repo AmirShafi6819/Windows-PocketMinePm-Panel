@@ -15,7 +15,7 @@ jobs:
   build:
     runs-on: windows-latest
     env:
-      PMPANEL_VERSION: 2.8.1
+      PMPANEL_VERSION: 2.8.2
       GOTOOLCHAIN: auto
     steps:
       - name: Checkout
