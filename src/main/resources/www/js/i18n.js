@@ -91,7 +91,7 @@ const DICT = {
     checking: 'در حال بررسی...', downloading: 'در حال دانلود', restore_prev: 'بازگرداندن phar قبلی',
     /* about */
     about_title: 'درباره', versions: 'نسخه‌ها', licenses: 'مجوزها', storage_usage: 'مصرف فضا',
-    links: 'لینک‌ها', credits: 'ساخته‌شده با PHP استاتیک pmmp برای اندروید',
+    links: 'لینک‌ها', credits: 'ساخته‌شده با PHP استاتیک pmmp برای ویندوز',
     view_license: 'این برنامه PocketMine-MP (LGPL-3.0) و PHP (PHP License) را باندل کرده است.',
     crashdumps: 'کرش‌دامپ‌ها', misc: 'متفرقه',
     /* v2.0.0 tools */
@@ -355,7 +355,7 @@ const DICT = {
     checking: 'Checking...', downloading: 'Downloading', restore_prev: 'Restore previous phar',
     /* about */
     about_title: 'About', versions: 'Versions', licenses: 'Licenses', storage_usage: 'Storage usage',
-    links: 'Links', credits: 'Built with pmmp static PHP for Android',
+    links: 'Links', credits: 'Built with pmmp static PHP for Windows',
     view_license: 'This app bundles PocketMine-MP (LGPL-3.0) and PHP (PHP License).',
     crashdumps: 'Crash dumps', misc: 'Misc',
     /* v2.0.0 tools */

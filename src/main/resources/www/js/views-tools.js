@@ -615,7 +615,7 @@ Views.about = (root) => {
   root.appendChild(h('div', { class: 'card' },
     h('div', { class: 'card-title' }, icon('grid'), t('server_info')),
     kv('Device', (dev.manufacturer || '') + ' ' + (dev.model || '')),
-    kv('Android', (dev.android || '—') + ' (SDK ' + dev.sdk + ')'),
+    kv('OS', (dev.android || '—') + (dev.sdk ? ' (SDK ' + dev.sdk + ')' : '')),
     kv('ABI', dev.abi || '—'),
     kv('RAM', fmtBytes(dev.totalRam || 0)),
     kv('Path', info.serverDir || '—')));

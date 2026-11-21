@@ -131,7 +131,12 @@ code, .console, .term-screen, pre { user-select: text; -webkit-user-select: text
 }
 #topbar {
   flex: none;
+  /* safe-area fallbacks first: the desktop engine (JavaFX WebKit) has no
+     env() support - without a plain fallback the whole declaration is
+     dropped and the shell collapses (dock jumps to the top, etc.) */
+  height: var(--top-h);
   height: calc(var(--top-h) + env(safe-area-inset-top));
+  padding: 0 16px;
   padding: env(safe-area-inset-top) 16px 0 16px;
   display: flex; align-items: center; justify-content: space-between; gap: 10px;
   background: rgba(6, 8, 13, 0.72);
@@ -148,12 +153,12 @@ code, .console, .term-screen, pre { user-select: text; -webkit-user-select: text
   color: #eaf2ff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-@supports (-webkit-background-clip: text) {
-  .brand-title {
-    background: linear-gradient(270deg, #ffffff 20%, #9ecbff 100%);
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
+/* The old gradient-clip text (@supports -webkit-background-clip:text) is gone:
+   the desktop engine (JavaFX WebKit 619) ADVERTISES the feature but paints
+   nothing, leaving the brand invisible. Solid color + soft glow keeps the
+   premium look and renders everywhere. */
+.brand-title {
+  text-shadow: 0 0 18px rgba(158, 203, 255, 0.35);
 }
 .top-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 /* gear button next to the status text (opens Settings) */
@@ -173,6 +178,7 @@ code, .console, .term-screen, pre { user-select: text; -webkit-user-select: text
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  padding: 16px 14px calc(var(--nav-h) + 34px);
   padding: 16px 14px calc(var(--nav-h) + env(safe-area-inset-bottom) + 34px);
   max-width: 800px;
   width: 100%;
@@ -182,6 +188,7 @@ code, .console, .term-screen, pre { user-select: text; -webkit-user-select: text
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  padding: 12px 12px calc(var(--nav-h) + 28px);
   padding: 12px 12px calc(var(--nav-h) + env(safe-area-inset-bottom) + 28px);
 }
 
@@ -193,6 +200,7 @@ code, .console, .term-screen, pre { user-select: text; -webkit-user-select: text
 #bottomnav {
   position: fixed;
   left: 12px; right: 12px;
+  bottom: 10px;
   bottom: calc(10px + env(safe-area-inset-bottom));
   height: var(--nav-h);
   padding: 0 10px;
@@ -848,6 +856,7 @@ label.field .fl { display: block; font-size: 12.5px; color: var(--muted); margin
 .term-topbar {
   display: flex; align-items: center; gap: 10px;
   padding: 8px 12px;
+  padding-top: 8px;
   padding-top: calc(8px + env(safe-area-inset-top));
   border-bottom: 1px solid var(--border);
   background: rgba(4, 6, 10, 0.96);
@@ -871,6 +880,7 @@ label.field .fl { display: block; font-size: 12.5px; color: var(--muted); margin
 .term-inputrow {
   display: flex; align-items: center; gap: 8px;
   padding: 8px 12px;
+  padding-bottom: 8px;
   padding-bottom: calc(8px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border);
   background: rgba(4, 6, 10, 0.96);
@@ -923,6 +933,7 @@ label.field .fl { display: block; font-size: 12.5px; color: var(--muted); margin
   background: linear-gradient(180deg, #15181f, #0e1015);
   border: 1px solid var(--border2); border-bottom: none;
   border-radius: 30px 30px 0 0;
+  padding: 8px 14px 14px;
   padding: 8px 14px calc(env(safe-area-inset-bottom) + 14px);
   transform: translateY(100%);
   transition: transform 0.5s var(--ease-ios);
@@ -964,7 +975,7 @@ label.field .fl { display: block; font-size: 12.5px; color: var(--muted); margin
 
 /* ================= toast ================= */
 #toastRoot {
-  position: fixed; bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 36px);
+  position: fixed; bottom: calc(var(--nav-h) + 36px); bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 36px);
   left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 8px;
   z-index: 90; pointer-events: none;
   padding: 0 16px;
@@ -1067,11 +1078,12 @@ a { color: var(--primary-hi); text-decoration: none; }
   :root { --top-h: 46px; --nav-h: 48px; --dock-inset: 4px; }
   #bottomnav {
     left: 10px; right: 10px;
+    bottom: 8px;
     bottom: calc(8px + env(safe-area-inset-bottom));
     align-items: center; padding: 0 4px;
   }
-  #view { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 26px); }
-  #view.fill { padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 22px); }
+  #view { padding-bottom: calc(var(--nav-h) + 26px); padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 26px); }
+  #view.fill { padding-bottom: calc(var(--nav-h) + 22px); padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom) + 22px); }
   .nav-btn { padding: 0; }
   .nav-ic svg { width: 21px; height: 21px; }
   #view { padding-top: 10px; }

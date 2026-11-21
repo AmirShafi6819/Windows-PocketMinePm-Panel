@@ -476,7 +476,7 @@ Views.home = (root) => {
     kv(t('app_version'), info.appVersion || '—'),
     kv('Phar', pharInfo.exists ? fmtBytes(pharInfo.size) : '—'),
     kv('CPU', ((info.device || {}).abi || '—') + ' / ' + ((info.device || {}).model || '')),
-    kv('Android', (info.device || {}).android || '—'),
+    kv('OS', (info.device || {}).android || '—'),
     kv(t('ram_usage') + ' (device)', fmtBytes((info.device || {}).totalRam || 0)));
   const infoCard = h('div', { class: 'card' },
     h('div', { class: 'card-title' }, icon('info'), t('server_info')),
