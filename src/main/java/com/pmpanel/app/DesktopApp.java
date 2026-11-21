@@ -55,6 +55,12 @@ public class DesktopApp extends Application {
     private Bridge bridge;
     private UiServer uiServer;
 
+    /* ---- resilient page loading (white-screen protection) ---- */
+    private static volatile String activeUrl;
+    private boolean fileFallbackTried = false;
+    private boolean recoveryShown = false;
+    private boolean reloadRetried = false;
+
     /* ---------------- pending pickers ---------------- */
     private static class PendingUpload {
         String reqId;
@@ -119,9 +125,10 @@ public class DesktopApp extends Application {
         WebEngine engine = web.getEngine();
         webEngine = engine;
         web.setContextMenuEnabled(false);
+        web.setFontSmoothingType(javafx.scene.text.FontSmoothingType.GRAY);
 
         StackPane root = new StackPane(web);
-        Scene scene = new Scene(root, 460, 840);
+        Scene scene = new Scene(root, 1100, 760);
         scene.setFill(javafx.scene.paint.Color.web("#05060A"));
         // keep the WebView filling the window
         root.setMinSize(Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE);
@@ -130,13 +137,13 @@ public class DesktopApp extends Application {
         engine.setOnAlert(e -> { /* page never calls alert(); ignore safely */ });
         engine.locationProperty().addListener((o, old, url) -> {
             // open external links in the default browser (same as Android WebViewClient)
-            if (url != null && !url.startsWith(uiServer.baseUrl()) && !url.startsWith("http://127.0.0.1:")) {
+            if (isForeignUrl(url)) {
                 String u = url;
                 Platform.runLater(() -> {
-                    if (webEngine != null && uiServer != null) {
+                    if (webEngine != null && activeUrl != null) {
                         try {
                             // prevent navigating the panel away; open externally instead
-                            String back = uiServer.baseUrl();
+                            String back = activeUrl;
                             webEngine.load(back);
                         } catch (Throwable ignored) {
                         }
@@ -160,15 +167,19 @@ public class DesktopApp extends Application {
                 pageReady = true;
                 flushPendingEvents();
             } else if (newState == Worker.State.FAILED) {
-                appendCrashLog("page load failed");
+                // BootGuard listens for FAILED too (same worker) - it owns the
+                // fallback chain, so nothing extra to do here.
             }
         });
 
+        /* primary load: local loopback UI server; BootGuard recovers through
+           the file:// fallback and the recovery page if anything goes wrong */
         String url = uiServer != null ? uiServer.baseUrl() : null;
         if (url == null || url.isEmpty()) {
-            // absolute fallback: load the extracted www directly from disk
-            url = new File(AppDirs.wwwDir(), "index.html").toURI().toString();
+            url = fileFallbackUrl();
         }
+        activeUrl = url;
+        BootGuard.arm(web, url, bootFallback);
         engine.load(url);
 
         stage.setTitle("PM Panel - PocketMine for Windows");
@@ -177,7 +188,7 @@ public class DesktopApp extends Application {
             stage.getIcons().add(new Image("/icons/pmpanel-64.png"));
         } catch (Throwable ignored) {
         }
-        stage.setMinWidth(380);
+        stage.setMinWidth(480);
         stage.setMinHeight(600);
         stage.setScene(scene);
         stage.setOnCloseRequest(e -> {
@@ -203,6 +214,106 @@ public class DesktopApp extends Application {
     public void stop() {
         if (uiServer != null) uiServer.stop();
     }
+
+    /* ================= resilient page loading ================= */
+
+    /**
+     * The load-fallback chain driven by BootGuard:
+     *   1. local loopback UiServer (primary, injected shim, stable origin)
+     *   2. file:// load of the extracted www (shim-injected copy) - used when
+     *      the server is unreachable (firewall/proxy/half-bound socket)
+     *   3. one reload of the primary URL (transient first-run hiccups)
+     *   4. bundled recovery page (dark, readable, tells the user what to do)
+     */
+    private final BootGuard.LoadFallback bootFallback = new BootGuard.LoadFallback() {
+
+        @Override
+        public void onLoadFailed() {
+            Platform.runLater(() -> {
+                if (recoveryShown) return;
+                String cur = activeUrl;
+                if (cur != null && cur.startsWith("http://127.0.0.1:")) {
+                    String fb = fileFallbackUrl();
+                    if (fb != null) {
+                        appendCrashLog("boot: http load failed -> falling back to file://");
+                        loadUrl(fb);
+                        return;
+                    }
+                }
+                showRecoveryPage();
+            });
+        }
+
+        @Override
+        public void onBootTimeout() {
+            Platform.runLater(() -> {
+                if (recoveryShown) return;
+                String cur = activeUrl;
+                boolean http = cur != null && cur.startsWith("http://127.0.0.1:");
+                if (http && !fileFallbackTried) {
+                    String fb = fileFallbackUrl();
+                    if (fb != null) {
+                        appendCrashLog("boot: http page never booted -> file:// fallback");
+                        loadUrl(fb);
+                        return;
+                    }
+                }
+                if (!reloadRetried) {
+                    reloadRetried = true;
+                    appendCrashLog("boot: retrying the primary URL once");
+                    loadUrl(cur);
+                    return;
+                }
+                showRecoveryPage();
+            });
+        }
+
+        @Override
+        public void showRecoveryPage() {
+            Platform.runLater(() -> {
+                if (recoveryShown) return;
+                recoveryShown = true;
+                appendCrashLog("boot: showing recovery page");
+                loadUrl(BootGuard.recoveryPageUrl());
+            });
+        }
+    };
+
+    private void loadUrl(String url) {
+        if (url == null) return;
+        activeUrl = url;
+        if (webEngine != null) webEngine.load(url);
+    }
+
+    /** file:// URL of the extracted www (shim injected; falls back to the jar copy). */
+    private String fileFallbackUrl() {
+        try {
+            byte[] html = uiServer != null ? UiServer.shimmedIndexHtml() : null;
+            if (html == null) return null;
+            File out = new File(AppDirs.wwwDir(), "index-desktop.html");
+            out.getParentFile().mkdirs();
+            try (FileOutputStream fo = new FileOutputStream(out)) {
+                fo.write(html);
+            }
+            fileFallbackTried = true;
+            appendCrashLog("boot: file:// fallback prepared at " + out.getAbsolutePath());
+            return out.toURI().toString();
+        } catch (Throwable t) {
+            appendCrashLog("boot: file:// fallback unavailable - " + Bridge.safeMsg(t));
+            return null;
+        }
+    }
+
+    /** Anything that is NOT the panel's own page opens in the system browser. */
+    private boolean isForeignUrl(String url) {
+        if (url == null) return false;
+        if (url.startsWith("http://127.0.0.1:")) return false;   // ui server
+        if (url.startsWith("file:")) return false;               // local fallback
+        if (url.startsWith("data:")) return false;               // recovery page
+        if (url.startsWith("about:")) return false;
+        return true;
+    }
+
 
     /* ================= window / app control ================= */
 
@@ -235,6 +346,19 @@ public class DesktopApp extends Application {
             }
             System.exit(0);
         }, "pm-exit").start();
+    }
+
+    /** Exit for the self-restart path (software-rendering relaunch). */
+    static void exitForRestart() {
+        pageReady = false;
+        Platform.exit();
+        new Thread(() -> {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ignored) {
+            }
+            System.exit(0);
+        }, "pm-restart-exit").start();
     }
 
     /** Tray callback after the last server stopped. */

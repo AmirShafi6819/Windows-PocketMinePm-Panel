@@ -83,6 +83,19 @@ public final class UiServer {
             return;
         }
         if (!f.isFile()) {
+            /* Recovery net: if resource extraction failed on the user's machine
+               (blocked folder, antivirus, OneDrive...), fall back to serving
+               straight from the app jar so the panel still boots. */
+            byte[] cp = classpathResource("/www" + path);
+            if (cp != null) {
+                if (path.endsWith("/index.html") || "/index.html".equals(path)) {
+                    send(ex, 200, "text/html; charset=utf-8", injectShim(cp));
+                } else {
+                    send(ex, 200, contentType(path), cp);
+                }
+                DesktopApp.appendCrashLog("ui: served from jar fallback: " + path);
+                return;
+            }
             send(ex, 404, "text/plain", "not found".getBytes(StandardCharsets.UTF_8));
             return;
         }
@@ -92,6 +105,37 @@ public final class UiServer {
             return;
         }
         send(ex, 200, contentType(path), readFile(f));
+    }
+
+    private static byte[] classpathResource(String resPath) {
+        try (InputStream in = UiServer.class.getResourceAsStream(resPath)) {
+            if (in == null) return null;
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream();
+            byte[] buf = new byte[65536];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            return out.toByteArray();
+        } catch (Throwable t) {
+            return null;
+        }
+    }
+
+    /**
+     * The full shim-injected index.html, taken from disk or (if extraction
+     * failed) straight from the jar - used by the file:// fallback load.
+     */
+    static byte[] shimmedIndexHtml() {
+        byte[] html = null;
+        File f = new File(AppDirs.wwwDir(), "index.html");
+        if (f.isFile()) {
+            try {
+                html = readFile(f);
+            } catch (IOException ignored) {
+            }
+        }
+        if (html == null) html = classpathResource("/www/index.html");
+        if (html == null) return null;
+        return injectShim(html);
     }
 
     private static byte[] readFile(File f) throws IOException {

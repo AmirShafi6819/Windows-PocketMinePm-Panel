@@ -81,12 +81,21 @@ public class Bridge {
                 return r;
             }
             case "bootstrap": {
-                try {
-                    Installer.ensure();
-                    return ok();
-                } catch (Throwable e) {
-                    return err("setup failed: " + safeMsg(e));
-                }
+                /* First run extracts the bundled PHP runtime + server phar
+                   (~20 MB) - running that here would block the FX/UI thread and
+                   show a frozen window for many seconds on slow disks. The UI
+                   ignores the reply (errors surface on start), so do the work
+                   on a background thread and answer immediately. */
+                final String profB = profileId;
+                new Thread(() -> {
+                    try {
+                        Installer.ensure(Profiles.dirOf(profB));
+                        DesktopApp.appendCrashLog("bootstrap: ready (" + profB + ")");
+                    } catch (Throwable e) {
+                        DesktopApp.appendCrashLog("bootstrap: failed - " + safeMsg(e));
+                    }
+                }, "pm-bootstrap").start();
+                return ok();
             }
             case "info":
                 return info(sm);
